@@ -1,0 +1,213 @@
+#include <stdlib.h>
+#include <GL/glut.h>
+#include <GL/GL.h>
+#include<math.h>
+#include <Windows.h>
+#include "game.h"
+
+#define COLUMNS 40
+#define ROWS  40
+//#define FPS 10
+
+extern short sDirection;
+bool gameOver=false;
+
+int FPS=10;
+int begin=0;
+int score=0;
+int start=0,n=500;
+int angle3=0,u=0,cvar=0;
+
+void Timer_callback(int);
+void display_callback();
+void reshape_callback(int,int);
+void keyboard_callback(int,int,int);
+void Keyboard2_callback(unsigned char,int,int);
+void *font=GLUT_BITMAP_TIMES_ROMAN_24;
+
+GLfloat c[3][3]={{1.0,0.0,0.0},{0.0,1.0,0.0},{0.0,0.0,1.0}};
+GLint ps,qs;
+GLfloat d[3][3]={{1.0,1.0,0.0},{1.0,1.0,0.0},{0.9,0.5,0.0}};
+
+
+void init()
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+	glClearColor(0.0,0.0,0.0,0.0);
+	initGrid(COLUMNS,ROWS);
+}
+void output(int x,int y,char *string)
+{
+	int len,siz;
+	glRasterPos2f(x,y);
+	len=(int) strlen(string);
+	for(siz=0;siz<len;siz++)
+		glutBitmapCharacter(font,string[siz]);
+}
+void disp_start()
+{
+	//gluOrtho2D(60,60,60,60);
+
+	glClear(GL_COLOR_BUFFER_BIT);
+	glClearColor(0.0,0.0,0.0,0.0);
+	float radius=20,x3,y3;
+    glColor3f(1.0,0.0,0.0);
+	output(5,15,"Press 'Esc' to quit"); 
+    glColor3fv(c[cvar]);
+    x3 = cos(angle3*(3.14/180.0)) * radius;
+    y3 = sin(angle3*(3.14/180.0)) * radius;
+output(9,30+y3," MINI PROJECT ON COMPUTER GRAPHICS AND VISUALIZATION ");
+glColor3fv(d[cvar]);
+output(10+u+x3,90+y3,"---------------------------------------------");
+glColor3fv(c[cvar]);
+output(18,33,"BANTAKAL");
+glColor3fv(c[cvar]);
+output(120,168,"----------");
+glColor3f(0.0,1.0,0.0);
+output(18,28,"SNAKE GAME");
+glColor3fv(c[cvar]);
+output(40,142,"---------------------------------------------");
+glColor3fv(c[cvar]);
+output(7,35,"SHRI MADHWA VADIRAJA INSTITUTE OF TECHNOLOGY AND MANAGEMENT");
+glColor3fv(c[cvar]);
+output(100,292,"--------------------------------------------------------------");
+glColor3f(0.9,0.9,0.9);
+output(5,22,"NAME:");
+output(5,20,"USN:");
+glColor3fv(c[cvar]);
+output(40,90,"======");
+output(150,90,"======");
+glColor3f(0.9,0.0,0.9);
+output(9,20,"NAVEED ALI"); 
+output(9,22,"4MW16CS007");
+output(27,20,"KEERTHAN ACHARYA");
+output(27,22,"4MW16CS028");
+glColor3fv(c[cvar]);
+output(5,10,"Press 'a' to continue");
+glPointSize(2.0);
+glBegin(GL_POINTS);
+	
+    glColor3fv(c[cvar]);
+for(ps=499;ps>-499;ps-=20)
+{
+	for(qs=499;qs>0;qs-=20)
+	{
+		glVertex2i(ps,n+qs);
+	}
+}
+   glEnd();
+glutPostRedisplay();
+}
+
+int main(int argc,char**argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
+    glutInitWindowPosition(10,10);
+    glutInitWindowSize(1000,600);
+    glutCreateWindow("SNAKE GAME ");
+    glutDisplayFunc(display_callback);
+	glutKeyboardFunc(Keyboard2_callback);
+	glutReshapeFunc(reshape_callback);
+	glutTimerFunc(0,Timer_callback,0);
+	glutSpecialFunc(keyboard_callback);
+    init();
+	glutMainLoop();
+    return 0;
+}
+
+void display_callback()
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+	
+	if(start==1)
+	{
+	drawGrid();
+	
+	drawFood();
+
+	
+	if(begin==1)
+	{
+	drawSnake();
+	
+	
+	if(gameOver)
+	{
+		char _score[10];
+		itoa(score,_score,10);
+		char text[50]="your score: ";
+		strcat(text,_score);
+		MessageBox(NULL,text,"game over",0);
+		exit(0);
+	}
+	}
+	}
+	else
+		disp_start();
+	glFlush();
+	glutSwapBuffers();
+	
+	
+}
+void reshape_callback(int w,int  h)
+{
+	glViewport(0,0,(GLsizei)w,(GLsizei)h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0.0,COLUMNS,0.0,ROWS,-1.0,1.0);
+	glMatrixMode(GL_MODELVIEW);
+}
+void Timer_callback(int)
+{
+	glutPostRedisplay();
+	if(score==5)
+		FPS=15;
+	if(score==15)
+		FPS=20;
+	if(score==20)
+		FPS=25;
+	if(score==25)
+		FPS=30;
+	if(score==30)
+		FPS=35;
+	if(score==35)
+		FPS=40;
+	glutTimerFunc(1000/FPS,Timer_callback,0);
+}
+void keyboard_callback(int key,int,int)
+{
+	switch(key)
+	{
+	case GLUT_KEY_UP:
+		if(sDirection!=DOWN)
+			sDirection=UP;
+		break;
+	case GLUT_KEY_DOWN:
+		if(sDirection!=UP)
+			sDirection=DOWN;
+		break;
+	case GLUT_KEY_RIGHT:
+		if(sDirection!=LEFT)
+			sDirection=RIGHT;
+		break;
+	case GLUT_KEY_LEFT:
+		if(sDirection!=RIGHT)
+			sDirection=LEFT;
+		break;
+	}
+
+}
+void Keyboard2_callback(unsigned char key,int x,int y)
+{
+	switch(key)
+	{
+	case 'a' : start=1;
+		glutPostRedisplay();
+		break;
+	case 27 : exit(0);
+		glutPostRedisplay();
+	case 'b' : begin=1;
+		break;
+	}
+}

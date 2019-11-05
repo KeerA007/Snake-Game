@@ -1,0 +1,134 @@
+#include<stdlib.h>
+#include<GL/glut.h>
+#include <GL/GL.h>
+#include<ctime>
+#include<windows.h>
+#include "game.h"
+
+extern int score;
+
+int gridX,gridY;
+int snake_lenght=5;
+bool food=true;
+int foodX,foodY;
+short sDirection = RIGHT;
+extern bool gameOver;
+
+int posX[60]={20,20,20,20,20},posY[60]={20.19,18,17,16};
+
+void initGrid(int x,int y)
+{
+	gridX=x;
+	gridY=y;
+}
+void unit(int,int);
+//void unit2(int,int);
+void drawGrid()
+{ 
+	int x,y;
+	for(x=0;x<gridX;x++)
+	{
+		for(y=0;y<gridY;y++)
+		{
+			unit(x,y);
+		}
+	}
+	
+}
+void unit(int x,int y)
+{
+	if(x==0 || y==0 || x==gridX-1  || y==gridY-1 || (x==10 && (y==17 || y==18 || y==19 || y==20 || y==21 || y==22 ||y==23 || y==16))|| (x==30 && (y==17 || y==18 || y==19 || y==20 || y==21 || y==22||y==23 || y==16)))
+	{
+		glLineWidth(3.0);
+	glColor3f(1.0,0.0,0.0);
+	}
+	
+	
+	else
+	{
+		glLineWidth(1.0);
+	glColor3f(0.0,0.0,0.0);
+	}
+	glBegin(GL_LINE_LOOP);
+	glVertex2f(x,y);
+	glVertex2f(x+1,y);
+	glVertex2f(x+1,y+1);
+	glVertex2f(x,y+1);
+	glEnd();
+}
+void drawFood()
+{
+	if(food)
+	{
+		random(foodX,foodY);
+	//Sleep(7000);
+	random1(foodX,foodY);
+	}
+	food=false;
+	glColor3f(0.0,0.0,1.0);
+	glRectf(foodX,foodY,foodX+1,foodY+1);
+}
+void drawSnake()
+{
+	int i;
+	for(i=snake_lenght-1;i>0;i--)
+	{
+		posX[i]=posX[i-1];
+		posY[i]=posY[i-1];
+	}
+	if(sDirection==UP)
+		posY[0]++;
+	else  if(sDirection==DOWN)
+		posY[0]--;
+	else if(sDirection==RIGHT)
+		posX[0]++;
+	else if(sDirection==LEFT)
+		posX[0]--;
+	for(int i=0;i<snake_lenght;i++)
+	{
+		if(i==0)
+			glColor3f(1.0,0.0,0.0);
+		else
+			glColor3f(1.0,0.5,1.0);
+		glRectd(posX[i],posY[i],posX[i]+1,posY[i]+1);
+		
+	}
+	if(posX[0]==0 || posX[0]==gridX-1  || posY[0]==0 || posY[0]==gridY-1)
+		gameOver=true;
+	if(posX[0]==10 &&( posY[0]==17 || posY[0]==18 ||  posY[0]==19 ||  posY[0]==20 || posY[0]==21 || posY[0]==22|| posY[0]==23 || posY[0]==16)) 
+		gameOver=true;
+	if(posX[0]==30 &&( posY[0]==17 || posY[0]==18 ||  posY[0]==19 ||  posY[0]==20 || posY[0]==21 || posY[0]==22|| posY[0]==23 || posY[0]==16))
+		gameOver=true;
+	for(i=1;i<60;i++)
+	{
+		if(posX[0]==posX[i] && posY[0]==posY[i])
+			gameOver=true;
+	}
+	if(posX[0]==foodX && posY[0]==foodY)
+	{
+		score++;
+		snake_lenght++;
+		if(snake_lenght>MAX)
+			snake_lenght=MAX;
+		food=true;
+	}
+		
+}
+void random(int &x,int  &y)
+{
+	int _maxX =  gridX-29;
+	int _maxY =  gridY-2;
+	int _min = 1;
+	srand(time(NULL));
+    x=_min + rand()  % (_maxX  - _min);
+	y=_min + rand()  % (_maxY  - _min);
+}
+void random1(int &x,int  &y)
+{
+	int _maxX =  gridX-2;
+	int _maxY =  gridY-8;
+	int _min = 1;
+	srand(time(NULL));
+    x=_min + rand()  % (_maxX  - _min);
+	y=_min + rand()  % (_maxY  - _min);
+}
